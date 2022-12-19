@@ -53,7 +53,7 @@ bindkey "^[[4~" end-of-line
 bindkey "^[[3~" delete-char
 
 if tput cbt &> /dev/null; then
-    bindkey "$(tput cbt)" reverse-menu-complete
+  bindkey "$(tput cbt)" reverse-menu-complete
 fi
 
 export VISUAL=nvim
@@ -66,63 +66,63 @@ source $HOME/.zsh/functions.zsh
 source $(brew --prefix)/opt/spaceship/spaceship.zsh
 
 if command -v fzf &>/dev/null; then
-    source $HOME/.zsh/fzf.zsh
+  source $HOME/.zsh/fzf.zsh
 fi
 
 if [ -f ${HOME}/.zshrc.local ]; then
-    source ${HOME}/.zshrc.local
+  source ${HOME}/.zshrc.local
 fi
 
 if [[ $TERM == "dumb" ]]; then # in emacs
-    PS1='%(?..[%?])%!:%~%# '
-    unsetopt zle
-    unsetopt prompt_cr
-    unsetopt prompt_subst
-    unfunction precmd
-    unfunction preexec
-  # else
-  #   echo "oops..."
+  PS1='%(?..[%?])%!:%~%# '
+  unsetopt zle
+  unsetopt prompt_cr
+  unsetopt prompt_subst
+  unfunction precmd
+  unfunction preexec
+# else
+#   echo "oops..."
 fi
 
 autoload -U add-zsh-hook
 function -set-tab-and-window-title() {
-    emulate -L zsh
-    local CMD="${1:gs/$/\\$}"
-    print -Pn "\e]0;$CMD:q\a"
+  emulate -L zsh
+  local CMD="${1:gs/$/\\$}"
+  print -Pn "\e]0;$CMD:q\a"
 }
 
 HISTCMD_LOCAL=0
 
 function -update-window-title-precmd() {
-    emulate -L zsh
-    if [[ HISTCMD_LOCAL -eq 0 ]]; then
-        -set-tab-and-window-title "$(basename $PWD)"
+  emulate -L zsh
+  if [[ HISTCMD_LOCAL -eq 0 ]]; then
+    -set-tab-and-window-title "$(basename $PWD)"
+  else
+    local LAST=$(history | tail -1 | awk '{print $2}')
+    if [ -n "$TMUX" ]; then
+      -set-tab-and-window-title "$LAST"
     else
-        local LAST=$(history | tail -1 | awk '{print $2}')
-        if [ -n "$TMUX" ]; then
-            -set-tab-and-window-title "$LAST"
-        else
-            -set-tab-and-window-title "$(basename $PWD) > $LAST"
-        fi
+      -set-tab-and-window-title "$(basename $PWD) > $LAST"
     fi
+  fi
 }
 add-zsh-hook precmd -update-window-title-precmd
 
 function -update-window-title-preexec() {
-    emulate -L zsh
-    setopt EXTENDED_GLOB
-    HISTCMD_LOCAL=$((++HISTCMD_LOCAL))
-    local TRIMMED="${2[(wr)^(*=*|mosh|ssh|sudo)]}"
-    if [ -n "$TMUX" ]; then
-        -set-tab-and-window-title "$TRIMMED"
-    else
-        -set-tab-and-window-title "$(basename $PWD) > $TRIMMED"
-    fi
+  emulate -L zsh
+  setopt EXTENDED_GLOB
+  HISTCMD_LOCAL=$((++HISTCMD_LOCAL))
+  local TRIMMED="${2[(wr)^(*=*|mosh|ssh|sudo)]}"
+  if [ -n "$TMUX" ]; then
+    -set-tab-and-window-title "$TRIMMED"
+  else
+    -set-tab-and-window-title "$(basename $PWD) > $TRIMMED"
+  fi
 }
 add-zsh-hook preexec -update-window-title-preexec
 
 if [ -d ${HOME}/.cabal/bin ]; then
-    export PATH="${HOME}/.cabal/bin:$PATH"
+  export PATH="${HOME}/.cabal/bin:$PATH"
 fi
 
 export PATH=$HOME/bin:$PATH
